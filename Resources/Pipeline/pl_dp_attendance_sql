@@ -1,0 +1,55 @@
+resources:
+  jobs:
+    PL_DP_ATTENDANCE:
+      name: PL_DP_ATTENDANCE
+      tasks:
+        - task_key: landing2dim
+          notebook_task:
+            notebook_path: /Workspace/Users/irporosh5@gmail.com/rivadataplatform/src/notebook/nb_ds2landing
+            source: WORKSPACE
+        - task_key: landing_class
+          depends_on:
+            - task_key: landing2dim
+          sql_task:
+            file:
+              path: /Workspace/Users/irporosh5@gmail.com/rivadataplatform/src/queries/dimensions/dimensation.class.sql
+              source: WORKSPACE
+            warehouse_id: 2528e0b922e6e82b
+        - task_key: landing_date
+          depends_on:
+            - task_key: landing2dim
+          sql_task:
+            file:
+              path: /Workspace/Users/irporosh5@gmail.com/rivadataplatform/src/queries/dimensions/dimensation.date.sql
+              source: WORKSPACE
+            warehouse_id: 2528e0b922e6e82b
+        - task_key: landing_dim_batch
+          depends_on:
+            - task_key: landing2dim
+          sql_task:
+            file:
+              path: /Workspace/Users/irporosh5@gmail.com/rivadataplatform/src/queries/dimensions/dimensation.batch.sql
+              source: WORKSPACE
+            warehouse_id: 2528e0b922e6e82b
+        - task_key: landing_student
+          depends_on:
+            - task_key: landing2dim
+          sql_task:
+            file:
+              path: /Workspace/Users/irporosh5@gmail.com/rivadataplatform/src/queries/dimensions/dimensation_student.sql
+              source: WORKSPACE
+            warehouse_id: 2528e0b922e6e82b
+        - task_key: landing2fact
+          depends_on:
+            - task_key: landing_student
+            - task_key: landing_class
+            - task_key: landing_date
+            - task_key: landing_dim_batch
+          sql_task:
+            file:
+              path: /Workspace/Users/irporosh5@gmail.com/rivadataplatform/src/queries/fact/fact.attendance.sql
+              source: WORKSPACE
+            warehouse_id: 2528e0b922e6e82b
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
